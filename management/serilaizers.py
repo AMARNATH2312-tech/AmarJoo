@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Items, CustomUser
+from .models import Items, CustomUser, Purchase
 
 
 class LoginSerializer(serializers.Serializer):
@@ -24,6 +24,20 @@ class UserCreationSerilaizer(serializers.ModelSerializer):
     
 
 class ItemsSerializers(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = Items
         fields = ("name", "quantity", "amount")
+    
+    def get_name(self, instance):
+        return instance.name.item_name
+
+
+
+
+class PurchasedItemSerializers(serializers.ModelSerializer):
+    items = ItemsSerializers( many=True)
+    class Meta:
+        model = Purchase
+        fields = ("purchase_date", "items", "amount_spent")

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     "debug_toolbar",
+    'corsheaders',
     "management",
     "rest_framework",
 ]
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
@@ -161,3 +163,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': ( 'rest_framework.permissions.IsAdminUser', ),
 }
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+PEXELS_API_KEY = 'drX53Har1AL5oUJRD9HEJNnSy7qfWHCsmAwAxGHm4zMUl5tCfDY8TDSL'

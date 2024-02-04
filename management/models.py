@@ -24,7 +24,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -44,7 +44,7 @@ class CustomUser(AbstractUser):
 
 
 class ItemInfo(models.Model):
-    item_name = models.CharField(max_length=255)
+    item_name = models.CharField(max_length=255, unique=True)
     image = models.ImageField(upload_to="veg_images")
 
     def __str__(self) -> str:
@@ -54,46 +54,44 @@ class ItemInfo(models.Model):
 class Items(models.Model):
     name = models.ForeignKey(ItemInfo, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
-    quantity = models.IntegerField(null=False)
+    quantity = models.CharField(null=False)
     amount = models.IntegerField(null=False)
 
     def __str__(self) -> str:
-        return self.name
+        return self.name.item_name
 
-
-
-
-
-class Purchase(models.Model):
-    purchase_date = models.DateTimeField(auto_now_add= True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    items = models.ManyToManyField(Items, related_name= "date_vegetables")
-    amount_spent = models.IntegerField()
-
-    def __str__(self) -> str:
-        return self.purchase_date
     
-
 class Amount(models.Model):
-    last_month_amount_left  = models.IntegerField(default=0)
+    last_month_amount_left  = models.IntegerField(default=0, null=True)
     default_amount          = models.IntegerField(default=14000)
-    extra_amount_last_month = models.IntegerField(default=0)
+    extra_amount_last_month = models.IntegerField(default=0, null =True)
+
 
 class Month(models.Model):
     amount = models.OneToOneField(Amount, on_delete=models.CASCADE)
     month_name = models.CharField(max_length=10, null=False)
-    purchases = models.ManyToManyField(Purchase, related_name="month_purchases")
-    money_spent = models.IntegerField()
+    purchases = models.ManyToManyField('Purchase', related_name="month_purchases")
+    money_spent = models.IntegerField(default=0, null=False)
 
     def __str__(self) -> str:
-        return f"Year : {self.get_months.year}==> Month : {self.month_name}"
+        return self.month_name.capitalize()
+
+class Purchase(models.Model):
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    items = models.ManyToManyField(Items, related_name="date_vegetables")
+    amount_spent = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.user.first_name} {self.user.last_name} : {self.purchase_date}"
+
 
 class Year(models.Model):
     year = models.CharField(max_length = 4, null=False, blank=False)
     months = models.ManyToManyField(Month, related_name="get_months")
 
     def __str__(self) -> str:
-        return f"Year is {self.year}"
+        return self.year 
 
 
 
